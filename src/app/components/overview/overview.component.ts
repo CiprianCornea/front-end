@@ -1,25 +1,35 @@
-import {Component, OnInit} from '@angular/core';
-import {Student} from "./model/stutent";
-import { StudentService } from './service/student.service';
-import {HttpErrorResponse} from "@angular/common/http";
-import {NgForm} from "@angular/forms";
+import { HttpErrorResponse } from '@angular/common/http';
+import { Component, OnInit } from '@angular/core';
+import { Student } from 'src/app/model/stutent';
+import { StudentService } from 'src/app/service/student.service';
 
 @Component({
-  selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
+  selector: 'app-overview',
+  templateUrl: './overview.component.html',
+  styleUrls: ['./overview.component.css']
 })
-export class AppComponent implements OnInit {
+export class OverviewComponent implements OnInit {
+
   public students: Student[] = [];
   public editStudent: Student | null | undefined;
   public deleteStudent: Student | null | undefined;
-  title: any;
 
-  constructor(private studentService: StudentService) {
+
+  constructor(private studentService: StudentService) { }
+
+  ngOnInit(): void {
+    this.getStudents();
   }
 
-  ngOnInit() {
-    this.getStudents();
+  public getStudents(): void {
+    this.studentService.getStudents().subscribe(
+      (response: Student[]) => {
+        this.students = response;
+      },
+      (error: HttpErrorResponse) => {
+        alert(error.message);
+      }
+    );
   }
 
   public onOpenModal(student: Student | null, mode: string): void {
@@ -40,9 +50,22 @@ export class AppComponent implements OnInit {
       button.setAttribute('data-target', '#deleteStudentModal');
     }
     // @ts-ignore
-    //container.appendChild(button);
-    //button.click();
+    container.appendChild(button);
+    button.click();
   }
+
+  public onDeleteStudent(studentId: number | undefined): void {
+    this.studentService.deleteStudents(studentId).subscribe(
+      (response: void) => {
+        //console.log(response);
+        this.getStudents();
+      },
+      (error: HttpErrorResponse) => {
+        alert(error.message);
+      }
+    );
+  }
+
   public searchStudent(key: string): void {
     //console.log(key);
     const results: Student[] = [];
@@ -59,17 +82,6 @@ export class AppComponent implements OnInit {
     if(!key) {
       this.getStudents();
     }
-  }
-
-  public getStudents(): void {
-    this.studentService.getStudents().subscribe(
-      (response: Student[]) => {
-        this.students = response;
-      },
-      (error: HttpErrorResponse) => {
-        alert(error.message);
-      }
-    );
   }
 
 }

@@ -1,6 +1,6 @@
 export interface  Student {
-  studentCode: string;
-  id?: number;
+  studentCode?: string;
+  id: number;
   name?: string;
   email?: string;
   specialization?: string;
